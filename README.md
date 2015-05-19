@@ -1,6 +1,6 @@
 # QSL
 
-QSL (qunar SASS Library)，参考了compass，bourbon及sassCore等众多优秀sass库，归纳总结而成。
+QSL (Qunar SASS Library)，参考了compass，bourbon及sassCore等众多优秀sass库，归纳总结而成。
 
 #如何使用
 	
