@@ -1,0 +1,304 @@
+@charset "utf-8";
+
+$setting: (
+    // 版本号
+    version:          "1.0.0",
+    // 是否开启厂商前缀
+    is-vendor-prefix: true,
+    // 厂商前缀
+    vendor-prefix:    -webkit-,
+    // 背景图片服务器
+    bgimg-domain:     "../../../bgimg/"
+) !default;
+
+
+/**
+ * 给需要的属性加厂家前缀
+ * @method prefix
+ * @param {String} $appearance 指定属性
+ * @param {String} $value 指定属性值
+ */
+@mixin prefix($property, $value) {
+    // 是否开启厂商前缀支持
+    @if map-get($setting, is-vendor-prefix) {
+        // 遍历输出厂商代码
+        @each $vendor in map-get($setting, vendor-prefix) {
+            #{$vendor}#{$property}: $value;
+        }
+    }
+    #{$property}: $value;
+}
+
+/**
+ * 定义响应式方案
+ * @method responsive
+ * @param {String} $media 指定媒体查询条件
+ * 使用方法如下，结合variables中的$media-types：
+    @include responsive(phone) {
+        .foo {
+            background: blue;
+        }
+    }
+ */
+@mixin responsive($media) {
+    @if not map-has-key($media-types, $media) {
+        @warn "#{$media} is not a known media type. Using portrait instead.";
+        $media: portrait;
+    }
+    @media #{map-get($media-types, $media)} {
+        @content;
+    }
+}
+
+/**
+ * 定义字体图标
+ * @method yofont
+ */
+@mixin yofont() {
+    // 是否开启图标字体
+    @if map-get($ico, is-use) {
+        @font-face {
+            font-family: map-get($ico, font-name);
+            // 如果只需要其中的某种字体，其它的几种字体可以使用空文件（不会请求），但必须存在
+            // IE9 - 不考虑IE9
+            // src: url("#{map-get($ico,font-path)}#{map-get($ico,font-name)}.eot");
+            src:
+                // IE6-8 - 不考虑
+                // url("#{map-get($ico,font-path)}#{map-get($ico,font-name)}.eot?#iefix") format("embedded-opentype"),
+                // chrome、firefox
+                url("#{map-get($ico,font-path)}#{map-get($ico,font-name)}.woff") format("woff"),
+                // chrome、firefox、opera、Safari, Android, iOS 4.2+
+                url("#{map-get($ico,font-path)}#{map-get($ico,font-name)}.ttf") format("truetype");
+                // iOS 4.1- - 不考虑
+                // url("#{map-get($ico,font-path)}#{map-get($ico,font-name)}.svg#iconfont") format("svg");
+        }
+        .yo-ico {
+            font-family: map-get($ico, font-name) !important;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-stroke-width: .1px;
+            -moz-osx-font-smoothing: grayscale;
+            vertical-align: middle;
+        }
+    }
+}
+
+/**
+ * 定义UA默认外观
+ * @method appearance
+ * @param {String} $appearance 指定UA外观类型
+ */
+@mixin appearance($appearance: none) {
+    @include prefix(appearance, $appearance);
+}
+
+/**
+ * 定义是否可以选中元素
+ * @method user-select
+ * @param {String} $user-select 指定是否可以选中
+ */
+@mixin user-select($user-select: none) {
+    @include prefix(user-select, $user-select);
+}
+
+/**
+ * 定义渐变色值
+ * @method gradient
+ * @param {String} $type 指定渐变的4种类型：linear, repeating-linear, radial, repeating-radial
+ * @param {String} $gradient 指定渐变取值，与原生语法一致
+ */
+@mixin gradient($type, $gradient...) {
+    @if map-get($setting, is-vendor-prefix) {
+        @each $vendor in map-get($setting, vendor-prefix) {
+            background-image: #{$vendor}#{$type}-gradient($gradient);
+        }
+    }
+    background-image: #{$type}-gradient($gradient);
+}
+
+/**
+ * 定义盒模型
+ * @method box-sizing
+ * @param {String} $box-sizing 的2个值分别为：content-box(标准盒模型) | border-box(怪异盒模型)
+ */
+@mixin box-sizing($box-sizing: border-box) {
+    @include prefix(box-sizing, $box-sizing);
+}
+
+/**
+ * 定义简单变换
+ * @method transform
+ * @param {String} $transform 取值与原生语法一致
+ */
+@mixin transform($transform...) {
+    @include prefix(transform, $transform);
+}
+
+/**
+ * 定义变换原点
+ * @method transform-origin
+ * @param {String} $transform-origin 取值与原生语法一致
+ */
+@mixin transform-origin($transform-origin) {
+    @include prefix(transform-origin, $transform-origin);
+}
+
+/**
+ * 定义动画
+ * @method animation
+ * @param {String} $animation 取值与原生语法一致
+ */
+@mixin animation($animation...) {
+    @include prefix(animation, $animation);
+}
+
+/**
+ * 定义补间
+ * @method transition
+ * @param {String} $transition 取值与原生语法一致
+ */
+@mixin transition($transition...){
+    $transitionable-prefixed-values: transform, transform-origin !default;
+    $vendor-list:();
+    $list:();
+
+    @if map-get($setting,is-vendor-prefix) {
+        @each $vendor in map-get($setting,vendor-prefix) {
+            @for $i from 1 through length($transition) {
+                @if type-of(nth($transition, $i)) == list {
+                    @if index($transitionable-prefixed-values, nth(nth($transition, $i),1)){
+                        $vendor-list:join($vendor-list, #{$vendor}#{nth($transition, $i)},$separator:comma);
+                    }@else{
+                        $vendor-list:join($vendor-list, #{nth($transition, $i)}, $separator:comma); 
+                    }
+                }
+            }
+            #{$vendor}transition:$vendor-list;
+            $vendor-list:();
+
+        }
+    }
+
+    @for $i from 1 through length($transition) {
+        $list:join($list, #{nth($transition, $i)},$separator:comma);
+    }
+    transition:$list;
+}
+
+// 定义伸缩盒
+@mixin flexbox($flexbox: flex) {
+    @if $flexbox == flex {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+    } @else {
+        display: -webkit-inline-box;
+        display: -webkit-inline-flex;
+        display: inline-flex;
+    }
+}
+// 定义伸缩盒子元素如何分配空间
+@mixin flex($flex: 1) {
+    -webkit-box-flex: $flex;
+    -webkit-flex: $flex;
+    flex: $flex;
+    // iOS6要求所有的伸缩盒子元素需要为非inline
+    display: block;
+    // 修复iOS6下不均分bug，任意非auto的值
+    width: 100%;
+}
+// 定义伸缩盒子元素的排版顺序
+@mixin order($order: 1) {
+    -webkit-box-ordinal-group: $order;
+    -webkit-order: $order;
+    order: $order;
+}
+// 定义伸缩盒子元素的流动方向
+@mixin flex-direction($flex-direction: row) {
+    @if $flex-direction == row {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+    } @else if $flex-direction == column {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+    } @else if $flex-direction == row-reverse {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: reverse;
+    } @else if $flex-direction == column-reverse {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: reverse;
+    }
+    -webkit-flex-direction: $flex-direction;
+    flex-direction: $flex-direction;
+}
+// 定义伸缩盒子元素溢出排版
+@mixin flex-wrap($flex-wrap: nowrap) {
+    @if $flex-wrap == nowrap {
+        -webkit-box-lines: single;
+    } @else {
+        -webkit-box-lines: multiple;
+    }
+    -webkit-flex-wrap: $flex-wrap;
+    flex-wrap: $flex-wrap;
+}
+// 定义伸缩盒子元素的水平对齐方式
+@mixin justify-content($justify-content: center) {
+    @if $justify-content == center {
+        -webkit-box-pack: center;
+    } @else if $justify-content == flex-start {
+        -webkit-box-pack: start;
+    } @else if $justify-content == flex-end {
+        -webkit-box-pack: end;
+    } @else if $justify-content == space-between {
+        -webkit-box-pack: justify;
+    }
+    -webkit-justify-content: $justify-content;
+    justify-content: $justify-content;
+}
+// 定义伸缩盒子元素的垂直对齐方式
+@mixin align-items($align-items: center) {
+    @if $align-items == center {
+        -webkit-box-align: center;
+    } @else if $align-items == flex-start {
+        -webkit-box-align: start;
+    } @else if $align-items == flex-end {
+        -webkit-box-align: end;
+    } @else {
+        -webkit-box-align: $align-items;
+    }
+    -webkit-align-items: $align-items;
+    align-items: $align-items;
+}
+// 定义伸缩盒子元素自身的垂直对齐方式
+@mixin align-self($align-self: center) {
+    -webkit-align-self: $align-self;
+    align-self: $align-self;
+}
+
+/**
+ * 计算
+ * @method calc
+ * capability Android 4.4+,chrome,ie9+
+ */
+
+@mixin calc($property, $value) {
+    @if map-get($setting, is-vendor-prefix) {
+        // 遍历输出厂商代码
+        @each $vendor in map-get($setting, vendor-prefix) {
+            #{$property}: #{$vendor}calc(#{$value});
+        }
+    }
+    #{$property}: calc(#{$value});
+}
+
+/**
+ * 滤镜
+ * @method filter
+ * capability Android 4.4+,chrome
+ */
+
+@mixin filter($filters...) {
+    @include prefix(filter,$filters...);
+}
+
+

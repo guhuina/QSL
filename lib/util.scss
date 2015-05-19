@@ -1,0 +1,107 @@
+@import "_placeholder";
+
+// 定义滚动条
+@mixin overflow($overflow:auto) {
+    @if $overflow == auto {
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    } @else {
+        overflow: $overflow;
+    }
+}
+
+// 生成矩形方法
+@mixin rect($width, $height) {
+    width: $width;
+    height: $height;
+}
+// 生成正方形方法
+@mixin square($size) {
+    width: $size;
+    height: $size;
+}
+// 生成圆形方法
+@mixin circle($radius:50%) {
+    border-radius: $radius;
+}
+
+// 清除浮动方案
+@mixin clearfix() {
+    &::after{
+        @extend clearfix;
+    }
+}
+
+// 强制换行方案
+@mixin wrap() {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+// 单行文本溢出显示方案
+@mixin ellipsis($ellipsis: ellipsis) {
+	@if $ellipsis == "ellipsis" {
+		@extend %ellipsis;
+	}@else if $ellipsis == "clip"{
+		@extend %ellipsis-clip;
+	}@else{
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: $ellipsis;
+	}
+}
+
+// 图文替换方案
+@mixin texthide() {
+    overflow: hidden;
+    white-space: nowrap;
+    text-indent: 100%;
+}
+
+// 清除间隙方案-容器
+@mixin killspace() {
+    font-size: 0;
+    font-family: arial;
+}
+
+// 清除间隙方案-子级
+@mixin killspace-item() {
+    display: inline-block;
+    font-size: map-get($base, font-size);
+    font-family: map-get($base, font-family);
+}
+
+// 未知尺寸元素垂直居中解决方案-容器
+@mixin valign() {
+    @include killspace();
+    &::after{
+        overflow: hidden;
+        width: 0;
+        height: 100%;
+        content: "\0020";
+        vertical-align: middle;
+    }
+}
+// 未知尺寸元素垂直居中解决方案-子级
+@mixin valign-item() {
+    @include killspace-item();
+    vertical-align: middle;
+}
+
+// 已经尺寸元素垂直居中解决方案
+@mixin alignment($width: 200px, $height: 200px) {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: $width;
+    height: $height;
+    margin-top: -$height/2;
+    margin-left: -$width/2;
+}
+
+
+
+
+
+
+

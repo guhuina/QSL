@@ -1,0 +1,20 @@
+// 清除浮动方案
+%clearfix{
+	display: block;
+    overflow: hidden;
+    clear: both;
+    height: 0;
+    content: "\0020";
+}
+
+// 单行文本溢出显示方案
+%ellipsis{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+%ellipsis-clip{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: clip;
+}

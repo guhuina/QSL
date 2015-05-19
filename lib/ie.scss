@@ -1,0 +1,32 @@
+// 行内元素转化成块元素
+@mixin inline-block(){
+	display: inline-block;
+	*display: inline;
+	*zoom: 1;
+}
+
+//浮动元素
+@mixin float($property){
+	float: $property;
+	_display:inline;
+}
+
+//半透明效果
+@mixin opacity($property){
+	opacity: $property;
+	filter: alpha(opacity = $property); 
+}
+
+//最小高度
+@mixin min-height($property){
+	height: auto!important;
+	min-height: $property;
+	_height: $property;
+}
+
+//最小宽度
+@mixin min-width($property){
+	width: auto!important;
+	min-width: $property;
+	_width: $property;
+}
