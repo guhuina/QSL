@@ -24,9 +24,3 @@
 	_height: $property;
 }
 
-//最小宽度
-@mixin min-width($property){
-	width: auto!important;
-	min-width: $property;
-	_width: $property;
-}
